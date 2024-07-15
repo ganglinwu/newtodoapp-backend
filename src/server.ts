@@ -9,6 +9,7 @@ import { loggingHandler } from "./middleware/loggingHandler";
 import { corsHandler } from "./middleware/corsHandler";
 import { routeNotFound } from "./middleware/routeNotFound";
 import { userProjectModel } from "./models/UserProjects";
+import { loginRouter } from "./routers/loginRouter";
 
 export const app = express();
 export let listener: ReturnType<typeof http.createServer>;
@@ -19,6 +20,7 @@ export const initializeServer = function () {
   logging.info("-------------------------------------");
   app.use(express.urlencoded({ extended: true }));
   app.use(express.json());
+  app.use(express.static("static"));
 
   logging.info("-------------------------------------");
   logging.info("Initialize logging handler");
@@ -31,11 +33,12 @@ export const initializeServer = function () {
   app.use(corsHandler);
 
   logging.info("-------------------------------------");
-  logging.info("Creating home route");
+  logging.info("Creating routes");
   logging.info("-------------------------------------");
   app.get("^/$|/index(.html)?", (req, res) => {
     res.status(200).send({ hello: "world" });
   });
+  app.use("/login", loginRouter);
 
   logging.info("-------------------------------------");
   logging.info("Creating health check route");
@@ -50,7 +53,6 @@ export const initializeServer = function () {
   app.get("/demodata(.html)?", async (req, res) => {
     try {
       const demoUserProjects = await userProjectModel.find({}).exec();
-      logging.info(demoUserProjects);
       res.status(200).send(demoUserProjects);
     } catch (error) {
       logging.error(error);
