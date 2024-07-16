@@ -22,7 +22,7 @@ loginRouter.post("(.html)?", async (req, res) => {
     }
     }
   } catch (err) {
-    res.status(400).json({ message: `${err}` + "username not found" });
+    res.status(500).json({ message: "Server error" });
     res.sendFile(path.join(__dirname, "..", "..", "/static", "/login.html"));
   }
 });
