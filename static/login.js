@@ -41,12 +41,15 @@ if (loginBtn === null) {
 }
 loginBtn.addEventListener("click", () =>
   __awaiter(void 0, void 0, void 0, function* () {
-    console.log("login button clicked");
     let xhr = new XMLHttpRequest();
     xhr.open("POST", "http://localhost:3001/login");
-    xhr.setRequestHeader("Content-type", "application/json; charset=UTF-8");
+    xhr.setRequestHeader("Content-type", "application/json");
+    xhr.setRequestHeader("Charset", "utf-8");
     xhr.send(
-      JSON.stringify({ userName: `${userName}`, password: `${password}` }),
+      JSON.stringify({
+        userName: `${userName.value}`,
+        password: `${password.value}`,
+      }),
     );
     xhr.onload = () => {
       if (xhr.status === 200) {
