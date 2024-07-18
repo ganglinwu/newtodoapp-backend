@@ -2,7 +2,7 @@ import express from "express";
 import logging from "./utils/logging";
 import http from "http";
 import mongoose from "mongoose";
-import { DATABASE_URI, PORT } from "./config/config";
+import { PORT } from "./config/config";
 
 import { connectDB } from "./middleware/connectDB";
 import { loggingHandler } from "./middleware/loggingHandler";
