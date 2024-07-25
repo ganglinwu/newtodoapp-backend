@@ -2,6 +2,8 @@ import express from "express";
 import logging from "./utils/logging";
 import http from "http";
 import mongoose from "mongoose";
+import cookieParser from "cookie-parser";
+
 import { PORT } from "./config/config";
 
 import { connectDB } from "./middleware/connectDB";
@@ -10,6 +12,8 @@ import { corsHandler } from "./middleware/corsHandler";
 import { routeNotFound } from "./middleware/routeNotFound";
 import { userProjectModel } from "./models/UserProjects";
 import { loginRouter } from "./routers/loginRouter";
+import { registerRouter } from "./routers/registerRouter";
+import { authCheck } from "./middleware/authCheck";
 
 export const app = express();
 export let listener: ReturnType<typeof http.createServer>;
@@ -20,6 +24,7 @@ export const initializeServer = function () {
   logging.info("-------------------------------------");
   app.use(express.urlencoded({ extended: true }));
   app.use(express.json());
+  app.use(cookieParser());
   app.use(express.static("static"));
 
   logging.info("-------------------------------------");
@@ -39,6 +44,7 @@ export const initializeServer = function () {
     res.status(200).send({ hello: "world" });
   });
   app.use("/login", loginRouter);
+  app.use("/register", registerRouter);
 
   logging.info("-------------------------------------");
   logging.info("Creating health check route");
@@ -50,7 +56,7 @@ export const initializeServer = function () {
   logging.info("-------------------------------------");
   logging.info("Creating demo data route");
   logging.info("-------------------------------------");
-  app.get("/demodata(.html)?", async (req, res) => {
+  app.get("/demodata(.html)?", authCheck, async (req, res) => {
     try {
       const demoUserProjects = await userProjectModel.find({}).exec();
       res.status(200).send(demoUserProjects);
