@@ -14,7 +14,9 @@ loginRouter.get("(.html)?", (req, res) => {
 
 loginRouter.post("(.html)?", async (req, res) => {
   const { userName, password } = req.body;
+  logging.log(userName);
   const user = await userModel.findOne({ userName }).exec();
+  logging.info(user);
   if (!user) {
     res.status(401).json({ message: "Unauthorized Access, Login failed" });
     logging.warn(
@@ -27,9 +29,14 @@ loginRouter.post("(.html)?", async (req, res) => {
     try {
       const result = await bcrypt.compare(password, user!.password);
       if (result) {
-        const token = jwt.sign({ userID: user!._id }, JWT_SECRETKEY!, {
-          expiresIn: "1h",
-        });
+        const token = jwt.sign(
+          { userName: user.userName, email: user.email },
+          JWT_SECRETKEY!,
+          {
+            expiresIn: "1h",
+          },
+        );
+        res.cookie("jwt", token, { httpOnly: true, sameSite: "strict" });
         res.status(200).json({ message: "Login Success", token });
       } else {
         logging.warning(
