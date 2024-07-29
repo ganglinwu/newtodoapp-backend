@@ -3,8 +3,8 @@ import { Request, Response, NextFunction } from "express";
 export function corsHandler(req: Request, res: Response, next: NextFunction) {
   res.header("Access-Control-Allow-Origin", "http://localhost:5173"); //TODO: response header needs to be updated
   res.header(
-    "Access-Control-Allow-Header",
-    "Origin, X-Requested-With, Content-Type, Accept, Authorization",
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Set-Cookie, Content-Type, Accept, Authorization, Charset",
   );
   res.header("Access-Control-Allow-Credentials", "true");
 
