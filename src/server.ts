@@ -13,8 +13,7 @@ import { routeNotFound } from "./middleware/routeNotFound";
 import { userProjectModel } from "./models/UserProjects";
 import { loginRouter } from "./routers/loginRouter";
 import { registerRouter } from "./routers/registerRouter";
-import { authCheck } from "./middleware/authCheck";
-import { authRouter } from "./routers/authRouter";
+import { authRouter, authCheck } from "./routers/authRouter";
 
 export const app = express();
 export let listener: ReturnType<typeof http.createServer>;
