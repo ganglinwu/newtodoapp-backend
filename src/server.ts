@@ -14,6 +14,7 @@ import { userProjectModel } from "./models/UserProjects";
 import { loginRouter } from "./routers/loginRouter";
 import { registerRouter } from "./routers/registerRouter";
 import { authRouter, authCheck } from "./routers/authRouter";
+import { refreshRouter } from "./routers/refreshRouter";
 
 export const app = express();
 export let listener: ReturnType<typeof http.createServer>;
@@ -45,6 +46,7 @@ export const initializeServer = function () {
   });
   app.use("/login", loginRouter);
   app.use("/register", registerRouter);
+  app.use("/refresh", refreshRouter);
   app.use("/auth", authRouter);
 
   logging.info("-------------------------------------");
