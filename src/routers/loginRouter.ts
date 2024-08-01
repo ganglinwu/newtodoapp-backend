@@ -14,39 +14,55 @@ loginRouter.get("(.html)?", (req, res) => {
 
 loginRouter.post("(.html)?", async (req, res) => {
   const { userName, password } = req.body;
-  logging.log(userName);
   const user = await userModel.findOne({ userName }).exec();
-  logging.info(user);
   if (!user) {
-    res.status(401).json({ message: "Unauthorized Access, Login failed" });
     logging.warn(
       `Unauthorized Access(No Such User) - REQ BODY:[${req.body}] - URL:[${req.url}] - IP:[${req.socket.remoteAddress}]`,
     );
+    return res
+      .status(401)
+      .json({ message: "Unauthorized Access, Login failed" });
   } else if (!JWT_SECRETKEY) {
     logging.warn("JWT_SECRETKEY NOT FOUND");
-    res.status(500).json({ message: "Server Error" });
-  } else {
-    try {
-      const result = await bcrypt.compare(password, user!.password);
-      if (result) {
-        const token = jwt.sign(
-          { userName: user.userName, email: user.email },
-          JWT_SECRETKEY!,
-          {
-            expiresIn: "1h",
-          },
-        );
-        res.cookie("jwt", token, { httpOnly: true, sameSite: "strict" });
-        res.status(200).json({ message: "Login Success", token });
-      } else {
-        logging.warning(
-          `Unauthorized Access(PASSWORD DOES NOT MATCH) - REQ BODY:[${req.body}] - URL:[${req.url}] - IP:[${req.socket.remoteAddress}]`,
-        );
-        res.status(401).json({ message: "Unauthorized Access, Login failed" });
-      }
-    } catch (err) {
-      logging.error(err.message);
-      res.status(500).json({ message: "Server error" });
+    return res.status(500).json({ message: "Server Error" });
+  }
+  try {
+    const result = await bcrypt.compare(password, user!.password);
+    if (result) {
+      const accessToken = jwt.sign(
+        { userName: user.userName, email: user.email },
+        JWT_SECRETKEY!,
+        {
+          expiresIn: "300",
+        },
+      );
+      const refreshToken = jwt.sign(
+        { userName: user.userName, email: user.email },
+        JWT_SECRETKEY!,
+        {
+          expiresIn: "1d",
+        },
+      );
+      res.clearCookie(accessToken);
+      res.clearCookie(refreshToken);
+      res.cookie("accessToken", accessToken, {
+        httpOnly: true,
+      });
+      res.cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        path: "/refresh",
+      });
+      return res.status(200).json({ message: "Login Success", accessToken });
+    } else {
+      logging.warning(
+        `Unauthorized Access(PASSWORD DOES NOT MATCH) - REQ BODY:[${req.body}] - URL:[${req.url}] - IP:[${req.socket.remoteAddress}]`,
+      );
+      return res
+        .status(401)
+        .json({ message: "Unauthorized Access, Login failed" });
     }
+  } catch (err) {
+    logging.error(err.message);
+    return res.status(500).json({ message: "Server error" });
   }
 });
