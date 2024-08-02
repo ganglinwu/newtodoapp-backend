@@ -15,6 +15,7 @@ import { loginRouter } from "./routers/loginRouter";
 import { registerRouter } from "./routers/registerRouter";
 import { authRouter, authCheck } from "./routers/authRouter";
 import { refreshRouter } from "./routers/refreshRouter";
+import { logoutRouter } from "./routers/logoutRouter";
 
 export const app = express();
 export let listener: ReturnType<typeof http.createServer>;
@@ -48,6 +49,7 @@ export const initializeServer = function () {
   app.use("/register", registerRouter);
   app.use("/refresh", refreshRouter);
   app.use("/auth", authRouter);
+  app.use("/logout", logoutRouter);
 
   logging.info("-------------------------------------");
   logging.info("Creating health check route");
