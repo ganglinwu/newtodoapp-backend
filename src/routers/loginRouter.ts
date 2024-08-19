@@ -52,7 +52,14 @@ loginRouter.post("(.html)?", async (req, res) => {
         httpOnly: true,
         path: "/refresh",
       });
-      return res.status(200).json({ message: "Login Success", accessToken });
+      return res
+        .status(200)
+        .json({
+          message: "Login Success",
+          accessToken,
+          username: user.userName,
+          email: user.email,
+        });
     } else {
       logging.warning(
         `Unauthorized Access(PASSWORD DOES NOT MATCH) - REQ BODY:[${req.body}] - URL:[${req.url}] - IP:[${req.socket.remoteAddress}]`,
