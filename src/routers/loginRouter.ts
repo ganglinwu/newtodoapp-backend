@@ -33,7 +33,7 @@ loginRouter.post("(.html)?", async (req, res) => {
         { userName: user.userName, email: user.email },
         JWT_SECRETKEY!,
         {
-          expiresIn: "300",
+          expiresIn: "60s",
         },
       );
       const refreshToken = jwt.sign(
@@ -47,10 +47,11 @@ loginRouter.post("(.html)?", async (req, res) => {
       res.clearCookie(refreshToken);
       res.cookie("accessToken", accessToken, {
         httpOnly: true,
+        sameSite: "strict",
       });
       res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
-        path: "/refresh",
+        sameSite: "strict",
       });
       return res
         .status(200)
