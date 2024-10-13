@@ -16,6 +16,7 @@ import { registerRouter } from "./routers/registerRouter";
 import { authRouter, authCheck } from "./routers/authRouter";
 import { refreshRouter } from "./routers/refreshRouter";
 import { logoutRouter } from "./routers/logoutRouter";
+import { dataRouter } from "./routers/dataRouter";
 
 export const app = express();
 export let listener: ReturnType<typeof http.createServer>;
@@ -25,7 +26,7 @@ export const initializeServer = function () {
   logging.info("Initialize API");
   logging.info("-------------------------------------");
   app.use(express.urlencoded({ extended: true }));
-  app.use(express.json());
+  app.use(express.json()); //allow access request body through req.body
   app.use(cookieParser());
   app.use(express.static("static"));
 
@@ -45,6 +46,7 @@ export const initializeServer = function () {
   app.get("^/$|/index(.html)?", (req, res) => {
     res.status(200).send({ hello: "world" });
   });
+  app.use("/api/data/", dataRouter);
   app.use("/login", loginRouter);
   app.use("/register", registerRouter);
   app.use("/refresh", refreshRouter);
